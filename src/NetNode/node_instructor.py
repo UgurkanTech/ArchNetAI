@@ -2,6 +2,7 @@ from typing import List
 import instructor
 from pydantic import BaseModel
 from rich.console import Console
+import time
 
 class NodeInstructor:
     def __init__(self, llama_model):
@@ -38,7 +39,14 @@ class NodeInstructor:
 
         console = Console()
 
+        start_time = time.time()
+
         for extraction in extraction_stream:
             obj = extraction.model_dump()
             console.clear()
             console.print(obj)
+
+        end_time = time.time()
+        exec_time = end_time - start_time
+
+        print(f"Total execution time: {exec_time:.4f} seconds")
