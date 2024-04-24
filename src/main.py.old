@@ -97,3 +97,12 @@ for extraction in extraction_stream:
     obj = extraction.model_dump()
     console.clear()  # (4)!
     console.print(obj)
+
+
+
+
+
+        self.history = [
+            ChatMessage("user", "My age is 25."),
+            ChatMessage("assistant", "Cool. What a nice age.")
+        ]
