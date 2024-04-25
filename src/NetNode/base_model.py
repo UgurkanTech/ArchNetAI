@@ -91,6 +91,9 @@ class NetModel:
     def printResult(self, stream):
         pass
 
+    def getResponseResult(self, stream):
+        pass
+
 
 class ChatModel(NetModel):
     def __init__(self, host, model):
@@ -163,6 +166,12 @@ class ImageModel(NetModel):
         print()
         timer.print_time()
 
+    def getResponseResult(self, stream):
+        response = ""
+        for chunk in stream:
+            response += chunk['message']['content']
+        return response
+
 class DataModel(NetModel):
     def __init__(self, host, model):
         super().__init__(host, model)
@@ -182,16 +191,21 @@ class DataModel(NetModel):
             keep_alive='1m'
         )
         return stream
+    
     def printResult(self, stream):
         timer = Timer()
         response = stream['response'].strip()
         print(response)
         timer.print_time()
 
+    def getResponseResult(self, stream):
+        return stream['response'].strip()
+
     def printStream(self, stream):
         self.printResult(stream)
 
 class InstructorModel(NetModel):
+
     def __init__(self, host, model):
         super().__init__(host, model)
         self.instructor = self._getJSONInstructor()
@@ -215,7 +229,7 @@ class InstructorModel(NetModel):
                     "content": f"In JSON format. {context}",
                 },
             ],
-            stream=True,
+            stream=False,
         )
         return stream
     
@@ -228,6 +242,12 @@ class InstructorModel(NetModel):
             console.print(obj)
         timer.print_time()
 
-
+    """Returns JSON string."""
+    def getResponseResult(self, stream):
+        return stream.model_dump()
+    
+    """Returns JSON Base Model object."""
+    def getResponseResultObject(self, stream):
+        return stream
     
 
