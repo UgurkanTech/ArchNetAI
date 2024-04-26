@@ -4,7 +4,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from NetNode import *
 
-model = NetModelFactory.createModel(ModelType.INSTRUCTOR, model="phi3")
+model = NetModelFactory.createModel(NetModelType.INSTRUCTOR, model="phi3")
 
 from pydantic import BaseModel
 
