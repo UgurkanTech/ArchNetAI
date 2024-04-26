@@ -7,7 +7,7 @@ from NetNode import *
 
 model = NetModelFactory.createModel(NetModelType.CHAT, model="phi3")
 
-options = Options(temperature=1, top_k=64, top_p=0.9, repeat_penalty=1.2, seed=-1, num_ctx=512, num_pred=64 , use_mlock=True)
+options = Options(temperature=1, top_k=64, top_p=0.9, repeat_penalty=1.2, seed=-1, num_ctx=512, num_pred=256 , use_mlock=True)
 
 model.setOptions(options)
 
