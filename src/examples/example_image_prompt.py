@@ -13,7 +13,7 @@ stream = model.getModelResponse("Explain this image.")
 
 #model.printStream(stream)
 
-print(model.getResponseResult(stream=stream))
+print(model.getResponseResult(stream))
 
 
 

@@ -20,23 +20,42 @@ These modules provide powerful functionality for AI-powered content generation, 
 
 Here are some examples of how to use ArchNetAI:
 
-**ChatModel example**
+**ChatModel Example**
 ```python
 from NetNode import *
 
 model = NetModelFactory.createModel(NetModelType.CHAT, model="phi3")
 options = Options(temperature=1, top_k=64, top_p=0.9, repeat_penalty=1.2, seed=-1, num_ctx=512, num_pred=256, use_mlock=True)
 model.setOptions(options)
+
 model.ChatInteractive()
 ```
 
-**ImageModel example**
+**ImageModel Example**
 ```python
 from NetNode import *
 
 model = NetModelFactory.createModel(NetModelType.IMAGE, model="llava")
 model.setImage("image.png")
 stream = model.getModelResponse("Explain this image.")
-#model.printStream(stream)
-print(model.getResponseResult(stream=stream))
+
+print(model.getResponseResult(stream))
+```
+
+**InstructorModel Object Fill Example**
+
+```python
+from NetNode import *
+from pydantic import BaseModel, Field
+
+model = NetModelFactory.createModel(NetModelType.INSTRUCTOR, model="phi3")
+
+class Cat(BaseModel):
+    fact: str = Field(..., description="A fact about cats.")
+    
+model.setJSONBaseModel(Cat)
+stream = model.getModelResponse("write a short cat fact about cat colors. JSON.")
+cat = model.getResponseResultObject(stream)
+
+print(cat.fact)
 ```

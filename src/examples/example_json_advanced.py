@@ -4,10 +4,9 @@ from typing import List
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from NetNode import *
+from pydantic import BaseModel, Field
 
 model = NetModelFactory.createModel(NetModelType.INSTRUCTOR, model="phi3")
-
-from pydantic import BaseModel, Field
 
 class User(BaseModel):
     name: str

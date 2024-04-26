@@ -12,4 +12,4 @@ model.setOptions(options)
 
 stream = model.getModelResponse("write one sentence cat fact about cats. fact=")
 
-print(model.getResponseResult(stream=stream))
+print(model.getResponseResult(stream))

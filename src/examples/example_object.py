@@ -3,20 +3,17 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from NetNode import *
+from pydantic import BaseModel, Field
 
 model = NetModelFactory.createModel(NetModelType.INSTRUCTOR, model="phi3")
 
-from pydantic import BaseModel
-
 class Cat(BaseModel):
-    fact: str
-    def __str__(self):
-        return f"Cat(fact='{self.fact}')"
+    fact: str = Field(..., description="A fact about cats.")
     
 model.setJSONBaseModel(Cat)
 
 stream = model.getModelResponse("write a short cat fact about cat colors. JSON.")
 
-cat = model.getResponseResultObject(stream=stream)
+cat = model.getResponseResultObject(stream)
 
 print(cat.fact)
