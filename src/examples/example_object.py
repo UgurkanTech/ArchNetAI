@@ -10,7 +10,6 @@ from pydantic import BaseModel
 
 class Cat(BaseModel):
     fact: str
-
     def __str__(self):
         return f"Cat(fact='{self.fact}')"
     

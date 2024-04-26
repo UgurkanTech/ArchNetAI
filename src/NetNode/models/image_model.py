@@ -2,6 +2,24 @@ from .net_model import NetModel
 from utils.tools import Timer, File
 
 class ImageModel(NetModel):
+    """
+    Represents an image model that interacts with a host and a model.
+
+    Args:
+        host (str): The host of the model.
+        model (str): The name of the model.
+
+    Attributes:
+        client: The client associated with the host.
+        image: The image in base64 format.
+
+    Methods:
+        setImage: Sets the image attribute by converting the given image path to base64.
+        getModelResponse: Retrieves the model response for the given context.
+        printStream: Prints the model response stream.
+        getResponseResult: Retrieves the concatenated model response from the stream.
+    """
+
     def __init__(self, host, model):
         super().__init__(host, model)
         self.client = self.host.client

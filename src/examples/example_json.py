@@ -13,7 +13,6 @@ class Cat(BaseModel):
     def __str__(self):
         return f"Cat(fact='{self.fact}')"
     
-
 model.setJSONBaseModel(Cat)
 
 stream = model.getModelResponse("write a short cat fact about cat colors. fact=")

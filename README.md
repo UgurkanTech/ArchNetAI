@@ -16,3 +16,27 @@ Created by [UgurkanTech](https://github.com/UgurkanTech)
 
 These modules provide powerful functionality for AI-powered content generation, data manipulation, image analysis, and template filling. They can be used individually or in combination to build sophisticated AI applications.
 
+# Examples
+
+Here are some examples of how to use ArchNetAI:
+
+**ChatModel example**
+```python
+from NetNode import *
+
+model = NetModelFactory.createModel(NetModelType.CHAT, model="phi3")
+options = Options(temperature=1, top_k=64, top_p=0.9, repeat_penalty=1.2, seed=-1, num_ctx=512, num_pred=256, use_mlock=True)
+model.setOptions(options)
+model.ChatInteractive()
+```
+
+**ImageModel example**
+```python
+from NetNode import *
+
+model = NetModelFactory.createModel(NetModelType.IMAGE, model="llava")
+model.setImage("image.png")
+stream = model.getModelResponse("Explain this image.")
+#model.printStream(stream)
+print(model.getResponseResult(stream=stream))
+```
