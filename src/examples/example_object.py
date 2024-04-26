@@ -12,7 +12,7 @@ class Cat(BaseModel):
     
 model.setJSONBaseModel(Cat)
 
-stream = model.getModelResponse("write a short cat fact about cat colors. JSON.")
+stream = model.getModelResponse("Write a short cat fact about cat colors.")
 
 cat = model.getResponseResultObject(stream)
 

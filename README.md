@@ -54,7 +54,7 @@ class Cat(BaseModel):
     fact: str = Field(..., description="A fact about cats.")
     
 model.setJSONBaseModel(Cat)
-stream = model.getModelResponse("write a short cat fact about cat colors. JSON.")
+stream = model.getModelResponse("Write a short cat fact about cat colors.")
 cat = model.getResponseResultObject(stream)
 
 print(cat.fact)
