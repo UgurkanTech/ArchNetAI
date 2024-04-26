@@ -3,9 +3,10 @@ import time
 import instructor
 from ollama import Client
 from openai import OpenAI
-from NetNode.utils import ChatMessage, File
+import base64
 import json
 from enum import Enum
+
 
 class OllamaHost():
     def __init__(self, host="http://localhost:11434/v1"):
@@ -25,6 +26,24 @@ class OllamaHost():
             self._client = Client(host=self._host)
         return self._client
 
+class File():
+    def convert_to_base64(file):
+        with open(file, "rb") as image_file:
+            str = base64.b64encode(image_file.read())
+        return str
+    
+class Options(dict):
+    def __init__(self, temperature, top_p, top_k, repeat_penalty, seed, num_ctx, num_pred, use_mlock):
+        super().__init__()
+        self['temperature'] = temperature
+        self['top_p'] = top_p
+        self['top_k'] = top_k
+        self['repeat_penalty'] = repeat_penalty
+        self['seed'] = seed
+        self['num_ctx'] = num_ctx
+        self['num_predict'] = num_pred
+        self['use_mlock'] = use_mlock
+
 class Timer:
     def __init__(self):
         self.start_time = time.time()
@@ -41,19 +60,6 @@ class ModelType(Enum):
     INSTRUCTOR = 3
     CHAT = 4
 
-class NetModelFactory:
-    @staticmethod
-    def createModel(modelType, host = "http://localhost:11434/v1", model = "phi3"):
-        if modelType == ModelType.IMAGE:
-            return ImageModel(host, model)
-        elif modelType == ModelType.DATA:
-            return DataModel(host, model)
-        elif modelType == ModelType.INSTRUCTOR:
-            return InstructorModel(host, model)
-        elif modelType == ModelType.CHAT:
-            return ChatModel(host, model)
-        else:
-            raise ValueError("Invalid model type")
 
 class NetModel:
     def __init__(self, host, model):
@@ -251,3 +257,16 @@ class InstructorModel(NetModel):
         return stream
     
 
+class NetModelFactory:
+    @staticmethod
+    def createModel(modelType, host = "http://localhost:11434/v1", model = "phi3"):
+        if modelType == ModelType.IMAGE:
+            return ImageModel(host, model)
+        elif modelType == ModelType.DATA:
+            return DataModel(host, model)
+        elif modelType == ModelType.INSTRUCTOR:
+            return InstructorModel(host, model)
+        elif modelType == ModelType.CHAT:
+            return ChatModel(host, model)
+        else:
+            raise ValueError("Invalid model type")
