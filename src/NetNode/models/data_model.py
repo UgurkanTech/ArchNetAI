@@ -29,7 +29,6 @@ class DataModel(NetModel):
         self.client = self.host.client
         self.resultMask.addType(ResultType.STRING)
         self.resultMask.addType(ResultType.STREAM)
-        print("DataModel initialized")
 
 
     @override
@@ -47,10 +46,18 @@ class DataModel(NetModel):
         self.modelResponse = self.client.generate(
             model=self.model,
             prompt=context,
-            images=[],
-            stream=False,
+            stream=self.options['stream'],
             format='json',
-            options=self.options,
-            keep_alive='1m'
+            options= {
+                'temperature': self.options['temperature'],
+                'top_k': self.options['top_k'],
+                'top_p': self.options['top_p'],
+                'repeat_penalty': self.options['repeat_penalty'],
+                'seed': self.options['seed'],
+                'num_ctx': self.options['num_ctx'],
+                'num_predict': self.options['num_predict'],
+                'use_mlock': self.options['use_mlock'],
+            },
+            keep_alive= self.options['keep_alive']
         )
         self.isChat = False

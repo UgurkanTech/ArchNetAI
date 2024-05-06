@@ -2,7 +2,7 @@ from enum import Enum
 from typing import override
 from ollama import Client
 from openai import OpenAI
-from .tools import Timer
+from .tools import File, Timer
 from rich.console import Console
 
 class OllamaHost():
@@ -69,8 +69,7 @@ class Options(dict):
         use_mlock (bool): Whether to use mlock for memory locking.
     """
 
-    def __init__(self, temperature, top_p, top_k, repeat_penalty, seed, num_ctx, num_pred, use_mlock):
-        super().__init__()
+    def __init__(self, temperature=1, top_p=0.9, top_k=64, repeat_penalty=1.2, seed=-1, num_ctx=512, num_pred=128, use_mlock=True, keep_alive='3m', stream=False):
         self['temperature'] = temperature
         self['top_p'] = top_p
         self['top_k'] = top_k
@@ -79,6 +78,36 @@ class Options(dict):
         self['num_ctx'] = num_ctx
         self['num_predict'] = num_pred
         self['use_mlock'] = use_mlock
+        self['keep_alive'] = keep_alive
+        self['stream'] = stream
+
+    def isStream(self):
+        return self['stream']
+    def setImage(self, imagePath):
+        self['images'] = [File.convert_to_base64(imagePath)]
+    def setBaseModel(self, baseModel):
+        self['response_model'] = baseModel
+    def getBaseModel(self):
+        return self['response_model']
+    def setStreaming(self, stream):
+        self['stream'] = stream
+    def setTemperature(self, temperature):
+        self['temperature'] = temperature
+    def setTopP(self, top_p):
+        self['top_p'] = top_p
+    def setTopK(self, top_k):
+        self['top_k'] = top_k
+    def setRepeatPenalty(self, repeat_penalty):
+        self['repeat_penalty'] = repeat_penalty
+    def setSeed(self, seed):
+        self['seed'] = seed
+    def setNumCtx(self, num_ctx):
+        self['num_ctx'] = num_ctx
+    def setNumPredict(self, num_pred):
+        self['num_predict'] = num_pred
+    def setUseMlock(self, use_mlock):
+        self['use_mlock'] = use_mlock
+
 
 class ResultMask(dict):
     def __init__(self):
@@ -113,20 +142,20 @@ class ResponseFactory():
             mask = ResultMask()
         self.mask = mask
     
-    def GenerateResponse(self, modelResponse, isChat, resultType):
+    def GenerateResponse(self, modelResponse, isChat, isStream, resultType):
         if not self.mask.contains(resultType):
             raise ValueError("Result type not allowed.")
 
         if resultType == ResultType.STRING:
-            return StringResponse(modelResponse, isChat).GetResult()
+            return StringResponse(modelResponse, isChat, isStream).GetResult()
         elif resultType == ResultType.STREAM:
-            StreamResponse(modelResponse, isChat).GetResult()
+            StreamResponse(modelResponse, isChat, isStream).GetResult()
         elif resultType == ResultType.OBJECT:
-            return ObjectResponse(modelResponse, isChat).GetResult()
+            return ObjectResponse(modelResponse, isChat, isStream).GetResult()
         elif resultType == ResultType.JSON_RESPONSE:
-            return JSONResponse(modelResponse, isChat).GetResult()
+            return JSONResponse(modelResponse, isChat, isStream).GetResult()
         elif resultType == ResultType.JSON_STREAM_RESPONSE:
-            JSONStreamResponse(modelResponse, isChat).GetResult()
+            JSONStreamResponse(modelResponse, isChat, isStream).GetResult()
         elif resultType == ResultType.INTERACTIVE:
             raise NotImplementedError("Interactive response not implemented.")
         else:
@@ -143,9 +172,10 @@ class Response():
 
     """
 
-    def __init__(self, modelResponse, isChat):
+    def __init__(self, modelResponse, isChat, isStream):
         self.modelResponse = modelResponse
         self.isChat = isChat
+        self.isStream = isStream
 
     def GetResult(self):
         pass
@@ -156,25 +186,21 @@ class StringResponse(Response):
 
     """
 
-    def __init__(self, modelResponse, isChat):
-        super().__init__(modelResponse, isChat)
+    def __init__(self, modelResponse, isChat, isStream):
+        super().__init__(modelResponse, isChat, isStream)
     
     @override
     def GetResult(self):
+        if self.isStream:
+            raise ValueError(f"Streaming must be disabled to use {self.__class__.__name__}")
+
         if self.isChat:
-            response = ""
-            for chunk in self.modelResponse:
-                response += chunk['message']['content'].strip()
+            response = self.modelResponse['message']['content'].strip()
             return response
-            #response = stream['response'].strip()
-            #print(response)
         else:
             response = self.modelResponse['response'].strip()
             return response
-            response = ""
-            for chunk in self.modelResponse:
-                response += chunk['response'].strip()
-            return response
+
 
 class StreamResponse(Response):
     """
@@ -182,10 +208,13 @@ class StreamResponse(Response):
 
     """
 
-    def __init__(self, modelResponse, isChat):
-        super().__init__(modelResponse, isChat)
+    def __init__(self, modelResponse, isChat, isStream):
+        super().__init__(modelResponse, isChat, isStream)
 
     def GetResult(self):
+        if not self.isStream:
+            raise ValueError(f"Streaming must be enabled to use {self.__class__.__name__}")
+
         if self.isChat:
             timer = Timer()
             for chunk in self.modelResponse:
@@ -209,10 +238,13 @@ class ObjectResponse(Response):
 
     """
 
-    def __init__(self, modelResponse, isChat):
-        super().__init__(modelResponse, isChat)
+    def __init__(self, modelResponse, isChat, isStream):
+        super().__init__(modelResponse, isChat, isStream)
 
     def GetResult(self):
+        if self.isStream:
+            raise ValueError(f"Streaming must be disabled to use {self.__class__.__name__}")
+
         return self.modelResponse
             
 
@@ -222,10 +254,13 @@ class JSONResponse(Response):
 
     """
 
-    def __init__(self, modelResponse, isChat):
-        super().__init__(modelResponse, isChat)
+    def __init__(self, modelResponse, isChat, isStream):
+        super().__init__(modelResponse, isChat, isStream)
 
     def GetResult(self):
+        if self.isStream:
+            raise ValueError(f"Streaming must be disabled to use {self.__class__.__name__}")
+
         return self.modelResponse.model_dump()
 
 class JSONStreamResponse(Response):
@@ -234,10 +269,13 @@ class JSONStreamResponse(Response):
 
     """
 
-    def __init__(self, modelResponse, isChat):
-        super().__init__(modelResponse, isChat)
+    def __init__(self, modelResponse, isChat, isStream):
+        super().__init__(modelResponse, isChat, isStream)
 
     def GetResult(self):
+        if not self.isStream:
+            raise ValueError(f"Streaming must be enabled to use {self.__class__.__name__}")
+
         console = Console()
         timer = Timer()
         for extraction in self.modelResponse:

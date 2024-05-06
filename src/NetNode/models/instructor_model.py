@@ -27,21 +27,10 @@ class InstructorModel(NetModel):
         self.instructor = instructor.from_openai(
             self.host.openai,
             mode=instructor.Mode.JSON,
-            temperature=0,
-            top_p=0.99,
-            seed=42,            
-            max_tokens=256,
-            #make changes here
+            temperature= self.options['temperature'],
+            top_p= self.options['top_p'],
+            seed= self.options['seed'],
         )
-    
-    def setJSONBaseModel(self, baseModel):
-        """
-        Sets the JSON base model for the instructor.
-
-        Args:
-            baseModel: The JSON base model to set.
-        """
-        self.baseModel = baseModel
 
     @override
     def createModelResponse(self, context):
@@ -56,13 +45,13 @@ class InstructorModel(NetModel):
         """
         self.modelResponse = self.instructor.completions.create(
             model= self.model,
-            response_model=instructor.Partial[self.baseModel],
+            response_model=instructor.Partial[self.options.getBaseModel()],
             messages=[
                 {
                     "role": "user",
                     "content": f"In valid JSON format. Do not use dict for strings. {context}",
                 },
             ],
-            stream=True, ## make changes here
+            stream= self.options['stream'],
         )
     

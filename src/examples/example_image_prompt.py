@@ -6,8 +6,8 @@ from NetNode import *
 
 model = NetModelFactory.createModel(NetModelType.IMAGE, model="llava")
 
-model.setImage("image.png")
-
+model.options.setImage("image.png")
+model.options.setStreaming(True)
 
 model.createModelResponse("Explain this image.")
 

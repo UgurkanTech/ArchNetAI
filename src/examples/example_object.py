@@ -10,7 +10,8 @@ model = NetModelFactory.createModel(NetModelType.INSTRUCTOR, model="phi3")
 class Cat(BaseModel):
     fact: str = Field(..., description="A fact about cats.")
     
-model.setJSONBaseModel(Cat)
+model.options.setBaseModel(Cat)
+model.options.setStreaming(False)
 
 model.createModelResponse("Write a short cat fact about cat colors.")
 

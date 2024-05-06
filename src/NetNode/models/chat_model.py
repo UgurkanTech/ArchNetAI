@@ -45,11 +45,20 @@ class ChatModel(NetModel):
         self.modelResponse = self.client.generate(
             model=self.model,
             prompt=context,
-            images=[],
-            stream=True,
-            options=self.options,
-            keep_alive='1m'
+            stream= self.options['stream'],
+            options= {
+                'temperature': self.options['temperature'],
+                'top_k': self.options['top_k'],
+                'top_p': self.options['top_p'],
+                'repeat_penalty': self.options['repeat_penalty'],
+                'seed': self.options['seed'],
+                'num_ctx': self.options['num_ctx'],
+                'num_predict': self.options['num_predict'],
+                'use_mlock': self.options['use_mlock'],
+            },
+            keep_alive= self.options['keep_alive']
         )
+        self.isChat = False
 
     @override
     def getResponse(self, resultType):
@@ -62,7 +71,7 @@ class ChatModel(NetModel):
         if resultType == ResultType.INTERACTIVE:
             return self._chatInteractive()
         else:
-            return res.GenerateResponse(self.modelResponse, self.isChat, resultType)
+            return res.GenerateResponse(self.modelResponse, self.isChat, self.options.isStream(), resultType)
 
     def _chatInteractive(self):
         """
@@ -71,6 +80,9 @@ class ChatModel(NetModel):
         The user can input prompts and receive responses from the model until they enter "exit".
 
         """
+        if not self.options.isStream():
+            print("Interactive chat is only available with stream enabled.")
+            return
         while True:
             prompt = input("You: ")
             if prompt.lower() == "exit":
@@ -78,6 +90,6 @@ class ChatModel(NetModel):
             try:
                 print("AI: ", end='')
                 self.createModelResponse(prompt)
-                StreamResponse(self.modelResponse, self.isChat).GetResult()
+                StreamResponse(self.modelResponse, self.isChat, self.options.isStream()).GetResult()
             except Exception as e:
                 print("An error occurred: ", str(e))

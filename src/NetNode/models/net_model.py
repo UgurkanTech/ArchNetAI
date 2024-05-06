@@ -33,13 +33,17 @@ class NetModel:
         self.resultMask = ResultMask()
         self.isChat = False
 
+        self.options = Options()
+
+        print(f"{self.__class__.__name__} initialized")
+
     def createModelResponse(self, context):
         self.modelResponse = None
         pass
 
     def getResponse(self, resultType):
         res = ResponseFactory(mask=self.resultMask)
-        return res.GenerateResponse(self.modelResponse, self.isChat, resultType)
+        return res.GenerateResponse(self.modelResponse, self.isChat, self.options.isStream(), resultType)
 
     def setOptions(self, options):
         """

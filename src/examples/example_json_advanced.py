@@ -33,7 +33,8 @@ The conference is on May 10th, 2024, at 1234 Tech Street. Keynote speaker: Elon 
 Proposals due by April 1st. Next meeting: March 15th, 3 PM GMT.
 """
 
-model.setJSONBaseModel(Meeting)
+model.options.setBaseModel(Meeting)
+model.options.setStreaming(True)
 
 model.createModelResponse(f"Get the information about the meeting and the users {text_block}")
 
