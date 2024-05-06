@@ -11,7 +11,6 @@ class Cat(BaseModel):
     fact: str = Field(..., description="A fact about cats.")
     
 model.options.setBaseModel(Cat)
-model.options.setStreaming(False)
 
 model.createModelResponse("Write a short cat fact about cat colors.")
 

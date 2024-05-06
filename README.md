@@ -25,10 +25,11 @@ Here are some examples of how to use ArchNetAI:
 from NetNode import *
 
 model = NetModelFactory.createModel(NetModelType.CHAT, model="phi3")
-options = Options(temperature=1, top_k=64, top_p=0.9, repeat_penalty=1.2, seed=-1, num_ctx=512, num_pred=256, use_mlock=True)
+options = Options(temperature=1, top_k=64, top_p=0.9, repeat_penalty=1.2, stream=True)
+
 model.setOptions(options)
 
-model.ChatInteractive()
+model.getResponse(resultType=ResultType.INTERACTIVE)
 ```
 
 **ImageModel Example**
@@ -36,10 +37,12 @@ model.ChatInteractive()
 from NetNode import *
 
 model = NetModelFactory.createModel(NetModelType.IMAGE, model="llava")
-model.setImage("image.png")
-stream = model.getModelResponse("Explain this image.")
+model.options.setImage("image.png")
+model.options.setStreaming(True)
 
-print(model.getResponseResult(stream))
+model.createModelResponse("Explain this image.")
+
+model.getResponse(resultType=ResultType.STREAM)
 ```
 
 **InstructorModel Object Fill Example**
@@ -53,9 +56,11 @@ model = NetModelFactory.createModel(NetModelType.INSTRUCTOR, model="phi3")
 class Cat(BaseModel):
     fact: str = Field(..., description="A fact about cats.")
     
-model.setJSONBaseModel(Cat)
-stream = model.getModelResponse("Write a short cat fact about cat colors.")
-cat = model.getResponseResultObject(stream)
+model.options.setBaseModel(Cat)
+
+model.createModelResponse("Write a short cat fact about cat colors.")
+
+cat = model.getResponse(resultType=ResultType.OBJECT)
 
 print(cat.fact)
 ```
