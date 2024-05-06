@@ -11,4 +11,4 @@ options = Options(temperature=1, top_k=64, top_p=0.9, repeat_penalty=1.2, seed=-
 
 model.setOptions(options)
 
-model.ChatInteractive()
+model.getResponse(resultType=ResultType.INTERACTIVE)

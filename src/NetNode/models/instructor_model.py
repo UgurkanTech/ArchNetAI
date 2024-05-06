@@ -2,24 +2,29 @@ from .net_model import NetModel
 from utils.tools import Timer
 from rich.console import Console
 import instructor
+from utils.model import *
 
 class InstructorModel(NetModel):
     """
     Represents an instructor model that interacts with the OpenAI API to generate responses based on user input.
     """
-
+    @override
     def __init__(self, host, model):
         super().__init__(host, model)
-        self.instructor = self._getJSONInstructor()
+        self._setInstructor()
 
-    def _getJSONInstructor(self):
+        self.resultMask.addType(ResultType.OBJECT)
+        self.resultMask.addType(ResultType.JSON_RESPONSE)
+        self.resultMask.addType(ResultType.JSON_STREAM_RESPONSE)
+
+    def _setInstructor(self):
         """
         Retrieves the JSON instructor from the OpenAI API.
 
         Returns:
             The JSON instructor object.
         """
-        return instructor.from_openai(
+        self.instructor = instructor.from_openai(
             self.host.openai,
             mode=instructor.Mode.JSON,
             temperature=0,
@@ -37,8 +42,9 @@ class InstructorModel(NetModel):
             baseModel: The JSON base model to set.
         """
         self.baseModel = baseModel
-    
-    def getModelResponse(self, context):
+
+    @override
+    def createModelResponse(self, context):
         """
         Generates a model response based on the given context.
 
@@ -48,7 +54,7 @@ class InstructorModel(NetModel):
         Returns:
             The response stream from the model.
         """
-        stream = self.instructor.completions.create(
+        self.modelResponse = self.instructor.completions.create(
             model= self.model,
             response_model=instructor.Partial[self.baseModel],
             messages=[
@@ -57,45 +63,6 @@ class InstructorModel(NetModel):
                     "content": f"In valid JSON format. Do not use dict for strings. {context}",
                 },
             ],
-            stream=False, ## make changes here
+            stream=True, ## make changes here
         )
-        return stream
     
-    def _printStream(self, stream): #fix this
-        """
-        Prints the model response stream.
-
-        Args:
-            stream: The response stream to print.
-        """
-        console = Console()
-        timer = Timer()
-        for extraction in stream:
-            obj = extraction.model_dump()
-            console.clear()
-            console.print(obj)
-        timer.print_time()
-
-    def getResponseResult(self, stream):
-        """
-        Returns the JSON string representation of the model response.
-
-        Args:
-            stream: The response stream.
-
-        Returns:
-            The JSON string representation of the model response.
-        """
-        return stream.model_dump()
-    
-    def getResponseResultObject(self, stream):
-        """
-        Returns the Base Model object of the model response.
-
-        Args:
-            stream: The response stream.
-
-        Returns:
-            The Base Model object of the model response.
-        """
-        return stream

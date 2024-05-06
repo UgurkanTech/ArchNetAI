@@ -12,8 +12,6 @@ class Cat(BaseModel):
 
 model.setJSONBaseModel(Cat)
 
-stream = model.getModelResponse("Write a short cat fact about cat colors.")
+model.createModelResponse("Write a short cat fact about cat colors.")
 
-#model.printStream(stream)
-
-print(model.getResponseResult(stream))
+print(model.getResponse(resultType=ResultType.JSON_RESPONSE))

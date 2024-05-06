@@ -1,5 +1,7 @@
+from typing import override
 from .net_model import NetModel
 from utils.tools import Timer, File
+from utils.model import *
 
 class ImageModel(NetModel):
     """
@@ -19,16 +21,22 @@ class ImageModel(NetModel):
         printStream: Prints the model response stream.
         getResponseResult: Retrieves the concatenated model response from the stream.
     """
-
+    @override
     def __init__(self, host, model):
         super().__init__(host, model)
         self.client = self.host.client
+
+        self.resultMask.addType(ResultType.STRING)
+        self.resultMask.addType(ResultType.STREAM)
+        
+        self.isChat = True
         
     def setImage(self, imagePath):
         self.image = File.convert_to_base64(imagePath)
-
-    def getModelResponse(self, context):
-        stream = self.client.chat(
+    
+    @override
+    def createModelResponse(self, context):
+        self.modelResponse = self.client.chat(
             model=self.model,
             messages=[{
             'role': 'user',
@@ -42,17 +50,3 @@ class ImageModel(NetModel):
             },
             keep_alive='1m'
         )
-        return stream
-
-    def printStream(self, stream):
-        timer = Timer()
-        for chunk in stream:
-            print(chunk['message']['content'], end='', flush=True)
-        print()
-        timer.print_time()
-
-    def getResponseResult(self, stream):
-        response = ""
-        for chunk in stream:
-            response += chunk['message']['content']
-        return response

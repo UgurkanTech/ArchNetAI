@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -29,9 +30,26 @@ class NetModel:
         self.host = OllamaHost(host)
         self.model = model
         self.pullModel()
+        self.resultMask = ResultMask()
+        self.isChat = False
 
-    def getModelResponse(self, context):
+    def createModelResponse(self, context):
+        self.modelResponse = None
         pass
+
+    def getResponse(self, resultType):
+        res = ResponseFactory(mask=self.resultMask)
+        return res.GenerateResponse(self.modelResponse, self.isChat, resultType)
+
+    def setOptions(self, options):
+        """
+        Sets the options for generating responses.
+
+        Args:
+            options (dict): The options to be used for generating responses.
+
+        """
+        self.options = options
 
     def pullModel(self):
         """
@@ -63,11 +81,3 @@ class NetModel:
                     return True
         return False
     
-    def printStream(self, stream):
-        pass
-
-    def printResult(self, stream):
-        pass
-
-    def getResponseResult(self, stream):
-        pass

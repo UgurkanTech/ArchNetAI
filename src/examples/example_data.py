@@ -10,6 +10,6 @@ options = Options(temperature=1, top_k=64, top_p=0.9, repeat_penalty=1.2, seed=-
 
 model.setOptions(options)
 
-stream = model.getModelResponse("write one sentence cat fact about cats. fact=")
+model.createModelResponse("write one sentence cat fact about cats. fact=")
 
-print(model.getResponseResult(stream))
+print(model.getResponse(resultType=ResultType.STRING))

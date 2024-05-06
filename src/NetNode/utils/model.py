@@ -1,5 +1,9 @@
+from enum import Enum
+from typing import override
 from ollama import Client
 from openai import OpenAI
+from .tools import Timer
+from rich.console import Console
 
 class OllamaHost():
     """
@@ -76,5 +80,168 @@ class Options(dict):
         self['num_predict'] = num_pred
         self['use_mlock'] = use_mlock
 
+class ResultMask(dict):
+    def __init__(self):
+        super().__init__()
+
+    def contains(self, resultType):
+        return any(key.value == resultType.value for key in self.keys())
+    
+    def addType(self, resultType):
+        self[resultType] = True
+
+class ResultType(Enum):
+    """
+    Enum for the type of result.
+    """
+    STRING = 1
+    STREAM = 2
+    OBJECT = 3
+    JSON_RESPONSE = 4
+    JSON_STREAM_RESPONSE = 5
+    INTERACTIVE = 6
+    
+    def __eq__(self, other):
+        return other.value == self.value
+    def __hash__(self):
+        return self.value.__hash__()
+
+class ResponseFactory():
+    
+    def __init__(self, mask):
+        if mask is None:
+            mask = ResultMask()
+        self.mask = mask
+    
+    def GenerateResponse(self, modelResponse, isChat, resultType):
+        if not self.mask.contains(resultType):
+            raise ValueError("Result type not allowed.")
+
+        if resultType == ResultType.STRING:
+            return StringResponse(modelResponse, isChat).GetResult()
+        elif resultType == ResultType.STREAM:
+            StreamResponse(modelResponse, isChat).GetResult()
+        elif resultType == ResultType.OBJECT:
+            return ObjectResponse(modelResponse, isChat).GetResult()
+        elif resultType == ResultType.JSON_RESPONSE:
+            return JSONResponse(modelResponse, isChat).GetResult()
+        elif resultType == ResultType.JSON_STREAM_RESPONSE:
+            JSONStreamResponse(modelResponse, isChat).GetResult()
+        elif resultType == ResultType.INTERACTIVE:
+            raise NotImplementedError("Interactive response not implemented.")
+        else:
+            print(resultType)
+            raise ValueError("Invalid result type.")
 
 
+class Response():
+    """
+    Represents a response from a model.
+
+    modelResponse: The response from the model.
+    isChat (bool): True for client.chat, False for client.generate
+
+    """
+
+    def __init__(self, modelResponse, isChat):
+        self.modelResponse = modelResponse
+        self.isChat = isChat
+
+    def GetResult(self):
+        pass
+
+class StringResponse(Response):
+    """
+    Represents a string response from a model.
+
+    """
+
+    def __init__(self, modelResponse, isChat):
+        super().__init__(modelResponse, isChat)
+    
+    @override
+    def GetResult(self):
+        if self.isChat:
+            response = ""
+            for chunk in self.modelResponse:
+                response += chunk['message']['content'].strip()
+            return response
+            #response = stream['response'].strip()
+            #print(response)
+        else:
+            response = self.modelResponse['response'].strip()
+            return response
+            response = ""
+            for chunk in self.modelResponse:
+                response += chunk['response'].strip()
+            return response
+
+class StreamResponse(Response):
+    """
+    Represents a stream response from a model.
+
+    """
+
+    def __init__(self, modelResponse, isChat):
+        super().__init__(modelResponse, isChat)
+
+    def GetResult(self):
+        if self.isChat:
+            timer = Timer()
+            for chunk in self.modelResponse:
+                print(chunk['message']['content'], end='', flush=True)
+                if 'usage' in chunk:
+                    print(f"\nTokens used: {chunk['usage']['total_tokens']}")
+            print()
+            timer.print_time()
+        else:
+            timer = Timer()
+            for chunk in self.modelResponse:
+                print(chunk['response'], end='', flush=True)
+                if 'usage' in chunk:
+                    print(f"\nTokens used: {chunk['usage']['total_tokens']}")
+            print()
+            timer.print_time()
+
+class ObjectResponse(Response):
+    """
+    Represents an object response from a model.
+
+    """
+
+    def __init__(self, modelResponse, isChat):
+        super().__init__(modelResponse, isChat)
+
+    def GetResult(self):
+        return self.modelResponse
+            
+
+class JSONResponse(Response):
+    """
+    Represents a JSON response from a model.
+
+    """
+
+    def __init__(self, modelResponse, isChat):
+        super().__init__(modelResponse, isChat)
+
+    def GetResult(self):
+        return self.modelResponse.model_dump()
+
+class JSONStreamResponse(Response):
+    """
+    Represents a JSON stream response from a model.
+
+    """
+
+    def __init__(self, modelResponse, isChat):
+        super().__init__(modelResponse, isChat)
+
+    def GetResult(self):
+        console = Console()
+        timer = Timer()
+        for extraction in self.modelResponse:
+            obj = extraction.model_dump()
+            console.clear()
+            console.print(obj)
+        timer.print_time()

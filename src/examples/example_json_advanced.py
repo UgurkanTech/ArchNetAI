@@ -35,8 +35,7 @@ Proposals due by April 1st. Next meeting: March 15th, 3 PM GMT.
 
 model.setJSONBaseModel(Meeting)
 
-stream = model.getModelResponse(f"Get the information about the meeting and the users {text_block}")
+model.createModelResponse(f"Get the information about the meeting and the users {text_block}")
 
-model.printStream(stream)
+model.getResponse(resultType=ResultType.JSON_STREAM_RESPONSE)
 
-#print(model.getResponseResult(stream=stream))
