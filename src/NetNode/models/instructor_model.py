@@ -1,8 +1,9 @@
+from typing import override
 from .net_model import NetModel
-from utils.tools import Timer
-from rich.console import Console
-import instructor
+from utils.tools import Timer, File
 from utils.model import *
+from utils.response import *
+import instructor
 
 class InstructorModel(NetModel):
     """

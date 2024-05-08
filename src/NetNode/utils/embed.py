@@ -1,5 +1,5 @@
 import numpy as np
-from .model import ResultType
+from .response import ResultType
 
 class Embedder():
     """

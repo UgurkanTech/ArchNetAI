@@ -5,8 +5,6 @@ from .instructor_model import InstructorModel
 from .chat_model import ChatModel
 from .embed_model import EmbedModel
 
-from enum import Enum
-
 class NetModelType(Enum):
     """
     Enum representing the types of network models.
