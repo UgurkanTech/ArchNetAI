@@ -1,4 +1,5 @@
 from enum import Enum
+from tqdm import tqdm
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -61,9 +62,27 @@ class NetModel:
         """
         if not self.checkModelExists():
             print(f"Model {self.model} not found. Pulling model...")
-            stream = self.host.client.pull(model=self.model, stream=True)
-            for chunk in stream:
-                print(chunk['status'], end='\n', flush=True)
+            
+            current_digest, bars = '', {}
+            for progress in self.host.client.pull(model=self.model, stream=True):
+                digest = progress.get('digest', '')
+                if digest != current_digest and current_digest in bars:
+                    bars[current_digest].close()
+
+                if not digest:
+                    print(progress.get('status'))
+                    continue
+
+                if digest not in bars and (total := progress.get('total')):
+                    bars[digest] = tqdm(total=total, desc=f'pulling {digest[7:19]}', unit='B', unit_scale=True)
+
+                if completed := progress.get('completed'):
+                    bars[digest].update(completed - bars[digest].n)
+
+                current_digest = digest
+
+
+
             print(f"Model {self.model} pulled successfully.")
         else:
             print(f"Model {self.model} ready on the server.")

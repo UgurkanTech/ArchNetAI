@@ -1,6 +1,5 @@
 import time
 import base64
-
 import time
 
 class Timer:
@@ -47,3 +46,4 @@ class File():
         with open(file, "rb") as image_file:
             str = base64.b64encode(image_file.read())
         return str
+    

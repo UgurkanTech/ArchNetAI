@@ -3,6 +3,7 @@ from .image_model import ImageModel
 from .data_model import DataModel
 from .instructor_model import InstructorModel
 from .chat_model import ChatModel
+from .embed_model import EmbedModel
 
 from enum import Enum
 
@@ -20,6 +21,7 @@ class NetModelType(Enum):
     DATA = 2
     INSTRUCTOR = 3
     CHAT = 4
+    EMBED = 5
 
 class NetModelFactory:
     """
@@ -42,13 +44,16 @@ class NetModelFactory:
         Raises:
         - ValueError: If an invalid model type is provided.
         """
-        if modelType == NetModelType.IMAGE:
-            return ImageModel(host, model)
-        elif modelType == NetModelType.DATA:
-            return DataModel(host, model)
-        elif modelType == NetModelType.INSTRUCTOR:
-            return InstructorModel(host, model)
-        elif modelType == NetModelType.CHAT:
-            return ChatModel(host, model)
-        else:
-            raise ValueError("Invalid model type")
+        match modelType:
+            case NetModelType.IMAGE:
+                return ImageModel(host, model)
+            case NetModelType.DATA:
+                return DataModel(host, model)
+            case NetModelType.INSTRUCTOR:
+                return InstructorModel(host, model)
+            case NetModelType.CHAT:
+                return ChatModel(host, model)
+            case NetModelType.EMBED:
+                return EmbedModel(host, model)
+            case _:
+                raise ValueError("Invalid model type")

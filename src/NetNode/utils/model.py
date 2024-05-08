@@ -129,6 +129,7 @@ class ResultType(Enum):
     JSON_RESPONSE = 4
     JSON_STREAM_RESPONSE = 5
     INTERACTIVE = 6
+    EMBEDDING = 7
     
     def __eq__(self, other):
         return other.value == self.value
@@ -146,21 +147,23 @@ class ResponseFactory():
         if not self.mask.contains(resultType):
             raise ValueError("Result type not allowed.")
 
-        if resultType == ResultType.STRING:
-            return StringResponse(modelResponse, isChat, isStream).GetResult()
-        elif resultType == ResultType.STREAM:
-            StreamResponse(modelResponse, isChat, isStream).GetResult()
-        elif resultType == ResultType.OBJECT:
-            return ObjectResponse(modelResponse, isChat, isStream).GetResult()
-        elif resultType == ResultType.JSON_RESPONSE:
-            return JSONResponse(modelResponse, isChat, isStream).GetResult()
-        elif resultType == ResultType.JSON_STREAM_RESPONSE:
-            JSONStreamResponse(modelResponse, isChat, isStream).GetResult()
-        elif resultType == ResultType.INTERACTIVE:
-            raise NotImplementedError("Interactive response not implemented.")
-        else:
-            print(resultType)
-            raise ValueError("Invalid result type.")
+        match resultType:
+            case ResultType.STRING:
+                return StringResponse(modelResponse, isChat, isStream).GetResult()
+            case ResultType.STREAM:
+                return StreamResponse(modelResponse, isChat, isStream).GetResult()
+            case ResultType.OBJECT:
+                return ObjectResponse(modelResponse, isChat, isStream).GetResult()
+            case ResultType.JSON_RESPONSE:
+                return JSONResponse(modelResponse, isChat, isStream).GetResult()
+            case ResultType.JSON_STREAM_RESPONSE:
+                return JSONStreamResponse(modelResponse, isChat, isStream).GetResult()
+            case ResultType.INTERACTIVE:
+                raise NotImplementedError("Interactive response not implemented.")
+            case ResultType.EMBEDDING:
+                return EmbeddingResponse(modelResponse, isChat, isStream).GetResult()
+            case _:
+                raise ValueError(f"Invalid result type: {resultType}")
 
 
 class Response():
@@ -283,3 +286,20 @@ class JSONStreamResponse(Response):
             console.clear()
             console.print(obj)
         timer.print_time()
+
+class EmbeddingResponse(Response):
+    """
+    Represents a JSON stream response from a model.
+
+    """
+
+    def __init__(self, modelResponse, isChat, isStream):
+        super().__init__(modelResponse, isChat, isStream)
+
+    def GetResult(self) -> list:
+        if self.isStream:
+            raise ValueError(f"Streaming must be disabled to use {self.__class__.__name__}")
+
+        response = self.modelResponse['embedding']
+        return response
+        
