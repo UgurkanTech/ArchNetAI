@@ -9,6 +9,5 @@ setup(
     description='Python library that leverages the Ollama API for generating AI-powered content.',
     author='UgurkanTech',
     install_requires=['instructor', 'numpy', 'ollama', 'openai', 'pydantic'],
-    tests_require=['pytest'],
-    
+    python_requires='>=3.12',
 )
