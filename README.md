@@ -4,6 +4,14 @@ ArchNetAI is a Python library that leverages the Ollama API for generating AI-po
 
 Created by [UgurkanTech](https://github.com/UgurkanTech)
 
+## Setup
+
+To install the NetNode module, navigate to the `setup.py` containing directory and run the following command:
+
+```bash
+pip3 install .
+```
+
 ## Features
 
 - **ChatModel:** A module for generating AI-powered chat responses. This module can be used to create a conversational AI assistant that can respond to user queries and engage in natural language conversations.
