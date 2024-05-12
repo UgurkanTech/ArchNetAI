@@ -6,7 +6,7 @@ from NetNode import *
 
 model = NetModelFactory.createModel(NetModelType.EMBED, model="all-minilm")
 
-emb = Embedder(model, vector_base=DictVectorBase(), n_ctx=512)
+emb = Embedder(model, vector_base=SQLiteVectorBase(), n_ctx=512)
 
 # Embed some text
 emb.embed("UgurkanTech is a computer engineer.", InputType.TEXT)
@@ -26,6 +26,6 @@ for match in result:
     print("-----------------------------------------------------------------------")
     
 #Debug virtio
-emb.print_virtio()
+#emb.print_virtio()
 #Debug vector base
-emb.vector_base.print_db()
+#emb.vector_base.print_db()
