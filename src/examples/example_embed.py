@@ -18,7 +18,7 @@ emb.embed("ArchNetAI is a python library for AI. ArchNetAI is a python library f
 emb.embed("data.txt", InputType.FILE_PATH)
 
 # Find best matches
-result = emb.find_best_matches("What is Archnet?", 3, "euclidean") # List[(Embedding, EmbeddingPart, float)]
+result = emb.find_best_matches("What is Archnet?", 3) # List[(Embedding, EmbeddingPart, float)]
 # Print results
 for match in result:
     print(f"Match: {match[0].id , match[1].index}, similarity: {match[2]:.4f}")
