@@ -10,6 +10,7 @@ from .utils.model import *
 from .utils.tools import *
 from .utils.embed import *
 from .utils.response import *
+from .utils.vector import *
 
 __version__ = '1.0'
 __name__ = 'NetNode'

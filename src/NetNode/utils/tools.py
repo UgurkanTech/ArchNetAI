@@ -1,6 +1,8 @@
 import time
 import base64
 import time
+import hashlib
+import os
 
 class Timer:
     """
@@ -46,4 +48,40 @@ class File():
         with open(file, "rb") as image_file:
             str = base64.b64encode(image_file.read())
         return str
-    
+
+class Hasher:
+    @staticmethod
+    def hash(input, chunk_size=8192, algorithm="sha1"):
+        """
+        Compute the hash of a file or text in chunks.
+
+        Args:
+            input (file-like object, str, or path-like object): The input to compute the hash of.
+            chunk_size (int, optional): The size of the chunks to read. Default is 8192.
+            algorithm (str, optional): The hash algorithm to use. Default is "sha1".
+
+        Returns:
+            str: The hash of the input.
+        """
+        hasher = hashlib.new(algorithm)
+        if isinstance(input, str):
+            # If input is a string, check if it's a file path
+            if os.path.isfile(input):
+                with open(input, 'rb') as f:
+                    while True:
+                        chunk = f.read(chunk_size)
+                        if not chunk:
+                            break
+                        hasher.update(chunk)
+            else:
+                hasher.update(input.encode())
+        else:
+            # If input is a file-like object, read it in chunks
+            while True:
+                chunk = input.read(chunk_size)
+                if not chunk:
+                    break
+                if isinstance(chunk, str):
+                    chunk = chunk.encode()
+                hasher.update(chunk)
+        return hasher.hexdigest()
