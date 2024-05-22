@@ -11,6 +11,9 @@ from .utils.tools import *
 from .utils.embed import *
 from .utils.response import *
 from .utils.vector import *
+from .utils.web import *
+from .utils.chat_context import *
+from .utils.debugger import *
 
 __version__ = '1.0'
 __name__ = 'NetNode'

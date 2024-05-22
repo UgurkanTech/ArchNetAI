@@ -4,6 +4,7 @@ from typing import List, Tuple
 import numpy as np
 from .response import ResultType
 from .tools import Hasher
+from enum import Enum
 
 class EmbeddingPart:
     embedding_id: int # Foreign key. The id of the embedding this part belongs to.
@@ -17,7 +18,7 @@ class Embedding:
     type: str # Type of the embedding. For filtering purposes.
     part_count: int # Number of parts of the embedding.
 
-class InputType:
+class InputType(Enum):
     """
     Represents the type of input for a network node.
 
@@ -28,7 +29,7 @@ class InputType:
     TEXT = 1
     FILE_PATH = 2
 
-class CalculateMethod:
+class CalculateMethod(Enum):
     """
     A class representing different calculation methods.
 
