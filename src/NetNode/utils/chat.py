@@ -19,27 +19,51 @@ class Sender(Enum):
 
 class ChatMessage:
     """
-    Class for the chat message.
+    Represents a chat message.
+
+    Attributes:
+        sender (Sender): The sender of the message.
+        message (str): The content of the message.
+        timestamp (str, optional): The timestamp of the message. Defaults to None.
     """
-    def __init__(self, sender : Sender, message : str, timestamp : str = None):
+
+    def __init__(self, sender: Sender, message: str, timestamp: str = None):
         self.sender = sender
         self.message = message
         self.timestamp = timestamp
 
     def getDict(self):
+        """
+        Returns the chat message as a dictionary.
+
+        Returns:
+            dict: The chat message as a dictionary.
+        """
         return {
             "role": self.sender.name.lower(),
             "content": self.message,
             "timestamp": self.timestamp
         }
-    
+
     def getContextDict(self):
+        """
+        Returns the chat message without the timestamp as a dictionary.
+
+        Returns:
+            dict: The chat message without the timestamp as a dictionary.
+        """
         return {
             "role": self.sender.name.lower(),
             "content": self.message
         }
-    
+
     def __str__(self):
+        """
+        Returns a string representation of the chat message.
+
+        Returns:
+            str: A string representation of the chat message.
+        """
         return "Time: " + str(self.timestamp) + " Sender: " + str(self.sender) + " Message: " + str(self.message)
 
     
@@ -105,19 +129,32 @@ class ChatHistory:
         self.messages = []
         self.length = 0
 
-    def saveToFile(self, filename = "chat_history.json"):
 
-        try:
-            with open(filename, 'w') as file:
-                json.dump(self.getHistoryDict(), file)
-        except Exception as e:
-            print("Error saving history to file.")
-            print(e)
-            return None
+    def saveToFile(self, filename = "chat_history.json"):
+            """
+            Save the chat history to a file.
+
+            Args:
+                filename (str, optional): The name of the file to save the chat history to. Defaults to "chat_history.json".
+            """
+
+            try:
+                with open(filename, 'w') as file:
+                    json.dump(self.getHistoryDict(), file)
+            except Exception as e:
+                print("Error saving history to file.")
+                print(e)
+                return None
         
 
-    def loadFromFile(self, filename = "chat_history.json"):
+    def loadFromFile(self, filename="chat_history.json"):
+        """
+        Load chat history from a file.
 
+        Args:
+            filename (str, optional): The name of the file to load the chat history from. Defaults to "chat_history.json".
+
+        """
         if not os.path.exists(filename):
             print("File does not exist. No history loaded.")
             return None

@@ -8,6 +8,7 @@ class HTMLCleaner:
     def __init__(self):
         pass
 
+    # Clean HTML content by removing script tags, CSS styles, HTML comments, hyperlinks, input fields, navigation menus, footers, and other unwanted content
     def clean(html_content):
         body = re.search('<body.*?>(.*)</body>', html_content, re.DOTALL)
         if body:
@@ -68,7 +69,8 @@ class HTMLCleaner:
             return body_content
         else:
             return None
-            
+
+    # Clean Google search results by extracting URLs from the search results. Do not use in production. Use SERP API for production. Your IP will be blocked by Google if you use this code in production! Use at your own risk!
     def clean_google_search(html_content):
         body = re.search('<body.*?>(.*)</body>', html_content, re.DOTALL)
         if body:
@@ -92,11 +94,13 @@ class HTMLCleaner:
                             domains.append(domain)
                    
             return urls
-        
+
+#Warning: Local development only. Do not use in production. Use SERP API for production. Your IP will be blocked by Google if you use this code in production! Use at your own risk!
 class WebScraper:
     def __init__(self) -> None:
         pass
 
+    #Warning: Local development only. Do not use in production. Use SERP API for production. Your IP will be blocked by Google if you use this code in production! Use at your own risk!
     def fetch_url(self, url: str) -> str:
 
         print("\nFetching URL: " + url + "\n")
@@ -118,7 +122,7 @@ class WebScraper:
         context = HTMLCleaner.clean(html_content)
 
         return context
-    
+    #Warning: Local development only. Do not use in production. Use SERP API for production. Your IP will be blocked by Google if you use this code in production! Use at your own risk!
     def fetch_google_search(self, query: str) -> str:
         query = query.replace(' ', '+')
         url = f"https://www.google.com/search?q={query}&num=3&hl=en&sa=N&filter=1&lr=lang_en"
