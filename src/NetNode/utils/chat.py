@@ -94,10 +94,7 @@ class ChatHistory:
     
     # For using in the chat context
     def getContextDict(self):
-        return {
-            "messages": [message.getContextDict() for message in self.messages],
-            "length": self.length
-        }
+        return [message.getContextDict() for message in self.messages]
     
     # For JSON deserialization
     def setHistoryDict(self, data):

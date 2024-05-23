@@ -3,6 +3,7 @@ import base64
 import time
 import hashlib
 import os
+from .debugger import Debug
 
 class Timer:
     """
@@ -31,7 +32,8 @@ class Timer:
         """
         Print the total execution time in seconds.
         """
-        print(f"Total execution time: {self.get_time():.4f} seconds")
+
+        Debug.print(f"Total execution time: {self.get_time():.4f} seconds")
 
 class File():
     """A class for file operations."""

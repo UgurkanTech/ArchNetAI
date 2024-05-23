@@ -54,7 +54,7 @@ class ChatContext:
             int: The token count.
         """
         count = 0
-        for message in historyDict["messages"]:
+        for message in historyDict:
             count += len(message["content"].split())
         return count
     
@@ -132,6 +132,7 @@ class ChatContext:
         Updates the chat context by processing the data and history.
         """
         Debug.print("Updating Context...")
+        self.context.clear()
         space = self.getFreeSpace() - self.n_pred
         Debug.print("Initial Context Space: ", space)
 
@@ -146,26 +147,32 @@ class ChatContext:
         space = self.getFreeSpace() - self.n_pred
         Debug.print("After System Context Space: ", space)
 
-        data_rate = 0.5
+        if self.data:
+            data_rate = 0.5
+        else:
+            data_rate = 0.0
 
         dataSpace = int(math.floor(space * data_rate))
 
         historySpace = space - dataSpace
 
+        Debug.print("Data Space: ", dataSpace, " History Space: ", historySpace)
+
         data_length = len(self.data.split())
-        if data_length > dataSpace:
-            data_tokens = self.data.split()
-            data_splitted = " ".join(data_tokens[:dataSpace])
-            self.context.push_message(ChatMessage(Sender.USER, data_splitted))
-            Debug.print("Data trimmed. dataSpace: ", dataSpace, " dataSize: ", len(self.data.split()))
-            dataSpace = 0
-        else:
-            self.context.push_message(ChatMessage(Sender.USER, self.data))
+        if dataSpace > 0:
+            if data_length > dataSpace:
+                data_tokens = self.data.split()
+                data_splitted = " ".join(data_tokens[:dataSpace])
+                self.context.push_message(ChatMessage(Sender.USER, data_splitted))
+                Debug.print("Data trimmed. dataSpace: ", dataSpace, " dataSize: ", len(self.data.split()))
+                dataSpace = 0
+            else:
+                self.context.push_message(ChatMessage(Sender.USER, self.data))
 
             
         #Reverse loop to get last message first. then reorder.
         temp_messages = []
-        for message in chat["messages"][::-1]:
+        for message in chat[::-1]:
             message_length = len(message["content"].split())
             if message_length > historySpace:
                 message_tokens = message["content"].split()

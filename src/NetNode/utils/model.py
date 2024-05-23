@@ -66,7 +66,7 @@ class Options(dict):
         use_mlock (bool): Whether to use mlock for memory locking.
     """
 
-    def __init__(self, temperature=1, top_p=0.9, top_k=64, repeat_penalty=1.2, seed=-1, num_ctx=512, num_pred=128, use_mlock=True, keep_alive='3m', stream=False):
+    def __init__(self, temperature=1, top_p=0.9, top_k=64, repeat_penalty=1.2, seed=-1, num_ctx=512, num_pred=128, use_mlock=True, keep_alive='3m', stream=False, system_prompt="You are a helpful daily assistant called NetNode.", stop=None):
         self['temperature'] = temperature
         self['top_p'] = top_p
         self['top_k'] = top_k
@@ -77,6 +77,8 @@ class Options(dict):
         self['use_mlock'] = use_mlock
         self['keep_alive'] = keep_alive
         self['stream'] = stream
+        self['system_prompt'] = system_prompt
+        self['stop'] = stop
 
     def isStream(self):
         return self['stream']
@@ -104,3 +106,7 @@ class Options(dict):
         self['num_predict'] = num_pred
     def setUseMlock(self, use_mlock):
         self['use_mlock'] = use_mlock
+    def setSystemPrompt(self, system_prompt):
+        self['system_prompt'] = system_prompt
+    def setStop(self, stop):
+        self['stop'] = stop

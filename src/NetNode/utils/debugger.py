@@ -2,7 +2,13 @@
 class Debug:
     debug = False
 
-    def setDebug(debug):
+    def on():
+        Debug.debug = True
+
+    def off():
+        Debug.debug = False
+
+    def set(debug):
         Debug.debug = debug
 
     def print(*args):

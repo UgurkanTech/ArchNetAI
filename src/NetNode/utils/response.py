@@ -2,6 +2,7 @@ from rich.console import Console
 from .tools import Timer
 from enum import Enum
 from typing import override
+from .debugger import Debug
 
 class ResultMask(dict):
     def __init__(self):
@@ -111,23 +112,28 @@ class StreamResponse(Response):
     def GetResult(self):
         if not self.isStream:
             raise ValueError(f"Streaming must be enabled to use {self.__class__.__name__}")
-
+        response = ""
         if self.isChat:
             timer = Timer()
             for chunk in self.modelResponse:
-                print(chunk['message']['content'], end='', flush=True)
-                if 'usage' in chunk:
-                    print(f"\nTokens used: {chunk['usage']['total_tokens']}")
+                msg = chunk['message']['content']
+                response += msg
+                print(msg, end='', flush=True)
+                if 'eval_count' in chunk:
+                    Debug.print(f"\nTokens created: {chunk['eval_count']}")
             print()
             timer.print_time()
         else:
             timer = Timer()
             for chunk in self.modelResponse:
-                print(chunk['response'], end='', flush=True)
-                if 'usage' in chunk:
-                    print(f"\nTokens used: {chunk['usage']['total_tokens']}")
+                msg = chunk['response']
+                response += msg
+                print(msg, end='', flush=True)
+                if 'eval_count' in chunk:
+                    Debug.print(f"\nTokens created: {chunk['eval_count']}")
             print()
             timer.print_time()
+        return response
 
 class ObjectResponse(Response):
     """

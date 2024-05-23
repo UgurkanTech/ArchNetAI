@@ -3,6 +3,7 @@ from .net_model import NetModel
 from utils.tools import *
 from utils.model import *
 from utils.response import *
+from utils.chat_context import *
 
 class ChatModel(NetModel):
     """
@@ -42,9 +43,9 @@ class ChatModel(NetModel):
             context (str): The context or prompt for generating the response.
 
         """
-        self.modelResponse = self.client.generate(
+        self.modelResponse = self.client.chat(
             model=self.model,
-            prompt=context,
+            messages= context,
             stream= self.options['stream'],
             options= {
                 'temperature': self.options['temperature'],
@@ -56,9 +57,9 @@ class ChatModel(NetModel):
                 'num_predict': self.options['num_predict'],
                 'use_mlock': self.options['use_mlock'],
             },
-            keep_alive= self.options['keep_alive']
+            keep_alive= self.options['keep_alive'],
         )
-        self.isChat = False
+        self.isChat = True
 
     @override
     def getResponse(self, resultType):
@@ -83,13 +84,24 @@ class ChatModel(NetModel):
         if not self.options.isStream():
             print("Interactive chat is only available with stream enabled.")
             return
+        
+        context = ChatContext(self.options['num_ctx'], self.options['num_predict'])
+        context.setSystemPrompt(self.options['system_prompt'])
+
+        history = ChatHistory()
         while True:
             prompt = input("You: ")
             if prompt.lower() == "exit":
                 break
             try:
                 print("AI: ", end='')
-                self.createModelResponse(prompt)
-                StreamResponse(self.modelResponse, self.isChat, self.options.isStream()).GetResult()
+                history.push_message(ChatMessage(Sender.USER, prompt))
+                
+                context.setHistory(history)
+                context.updateContext()
+                Debug.print("Context: ", context.context.getContextDict())
+                self.createModelResponse(context.context.getContextDict())
+                result = StreamResponse(self.modelResponse, self.isChat, self.options.isStream()).GetResult()
+                history.push_message(ChatMessage(Sender.ASSISTANT, result))
             except Exception as e:
                 print("An error occurred: ", str(e))
