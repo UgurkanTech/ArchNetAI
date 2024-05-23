@@ -41,7 +41,7 @@ class ChatContext:
 
         self.data = ""
         self.system = ""
-        self.history = None
+        self.history = ChatHistory()
     
     def getTokenCount(self, historyDict : dict):
         """
