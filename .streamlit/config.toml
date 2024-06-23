@@ -1,0 +1,26 @@
+[theme]
+primaryColor = "#19C37D"  # ChatGPT's green color
+backgroundColor = "#343541"  # Dark background like ChatGPT
+secondaryBackgroundColor = "#444654"  # Slightly lighter background for contrast
+textColor = "#FFFFFF"  # White text
+font = "sans serif"
+
+[server]
+enableCORS = false
+enableXsrfProtection = false
+
+[browser]
+gatherUsageStats = false
+
+[global]
+developmentMode = false
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = false
+
+[runner]
+fastReruns = true
+
+[logger]
+level = "warning"
