@@ -4,6 +4,11 @@ ArchNetAI is a Python library that leverages the Ollama API for generating AI-po
 
 Created by [UgurkanTech](https://github.com/UgurkanTech)
 
+## Streamlit Example
+
+<img width="1007" alt="archnet" src="https://github.com/UgurkanTech/ArchNetAI/assets/39236929/36c8e30a-d914-49e2-a551-53076c5e069b">
+
+
 ## Setup
 
 To install the NetNode module, Install [Ollama](https://ollama.com/) then navigate to the `setup.py` containing directory and run the following command:
